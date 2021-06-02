@@ -4,16 +4,19 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.yanzu.yygh.common.result.Result;
+import com.yanzu.yygh.common.util.MD5;
 import com.yanzu.yygh.hosp.service.HospitalSetService;
 import com.yanzu.yygh.model.hosp.HospitalSet;
 import com.yanzu.yygh.vo.HospSetQueryVo;
 import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiModelProperty;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Random;
 
 /**
  * @auther 吴彦祖
@@ -35,7 +38,7 @@ public class HospitalSetController {
     }
     //逻辑删除医院设置（不是真的删除，只是查不到了，实体类有逻辑删除注解）
     @ApiOperation("删除医院设置")
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/delete/{id}")
     public Result deleteHospitalSet(@PathVariable("id") Integer id){
         boolean flag = hospitalSetService.removeById(id);
         if(flag) {
@@ -57,8 +60,17 @@ public class HospitalSetController {
         if (!StringUtils.isEmpty(hospSetQueryVo.getHoscode())){
             wrapper.eq("hoscode",hospSetQueryVo.getHoscode());
         }
-        IPage<HospitalSet> pageHospSet = hospitalSetService.page(page, wrapper);
+        Page<HospitalSet> pageHospSet = hospitalSetService.page(page, wrapper);
         return Result.ok(pageHospSet);
+    }
+
+    @ApiModelProperty("添加医院设置信息")
+    @PostMapping("/save")
+    public Result saveHospSet(@RequestBody HospitalSet hospitalSet){
+        hospitalSet.setStatus(1);
+        Random random = new Random();
+        hospitalSet.setSignKey(MD5.encrypt(System.currentTimeMillis()+""+random.nextInt(1000)));
+        return hospitalSetService.save(hospitalSet) ? Result.ok() : Result.fail();
     }
 
 }
