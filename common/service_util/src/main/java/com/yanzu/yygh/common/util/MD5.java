@@ -4,6 +4,7 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
 /**
+ * MD5加密
  * @auther 吴彦祖
  * @date 2021/6/2
  */
