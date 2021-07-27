@@ -8,4 +8,5 @@ import com.yanzu.yygh.model.hosp.HospitalSet;
  * @date 2021/6/1
  */
 public interface HospitalSetService extends IService<HospitalSet> {
+    String getSignKey(String hoscode);
 }

@@ -57,7 +57,7 @@ public class Result<T> {
     }
 
     public static <T> Result<T> fail(){
-        return Result.fail();
+        return Result.fail(null);
     }
 
     public static <T> Result<T> fail(T data){

@@ -2,7 +2,7 @@ package com.yanzu.yygh.hosp.dao;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.yanzu.yygh.model.hosp.HospitalSet;
-import org.apache.ibatis.annotations.Mapper;
+
 
 /**
  * @auther 吴彦祖

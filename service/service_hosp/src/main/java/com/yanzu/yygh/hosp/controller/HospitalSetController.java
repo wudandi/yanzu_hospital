@@ -1,7 +1,9 @@
 package com.yanzu.yygh.hosp.controller;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.yanzu.yygh.common.exception.HospitalException;
 import com.yanzu.yygh.common.result.Result;
 import com.yanzu.yygh.common.util.MD5;
 import com.yanzu.yygh.hosp.service.HospitalSetService;
@@ -23,6 +25,7 @@ import java.util.Random;
 @Api(tags = "医院管理设置")
 @RestController
 @RequestMapping("/admin/hosp/hospitalSet")
+@CrossOrigin//跨域访问问题
 public class HospitalSetController {
     @Autowired
     private HospitalSetService hospitalSetService;
@@ -49,16 +52,18 @@ public class HospitalSetController {
     //使用vo类封装条件值
     @ApiOperation("条件查询带分页")
     @PostMapping("/findPage/{current}/{limit}")
-    public Result findPageHospitalSet(@PathVariable("current") long current, @PathVariable("limit") long limit, @RequestBody(required = false) HospSetQueryVo hospSetQueryVo){
+    public Result findPageHospitalSet(@PathVariable("current") long current,
+                                      @PathVariable("limit") long limit,
+                                      @RequestBody(required = false) HospSetQueryVo hospSetQueryVo){
         Page<HospitalSet> page = new Page<>(current, limit);
         QueryWrapper<HospitalSet> wrapper = new QueryWrapper<>();
-        if (!StringUtils.isEmpty(hospSetQueryVo.getHoscode())){
-            wrapper.like("hosname",hospSetQueryVo.getHospname());
+        if (!StringUtils.isEmpty(hospSetQueryVo.getHosname())){
+            wrapper.like("hosname",hospSetQueryVo.getHosname());
         }
         if (!StringUtils.isEmpty(hospSetQueryVo.getHoscode())){
             wrapper.eq("hoscode",hospSetQueryVo.getHoscode());
         }
-        Page<HospitalSet> pageHospSet = hospitalSetService.page(page, wrapper);
+        IPage<HospitalSet> pageHospSet = hospitalSetService.page(page,wrapper);
         return Result.ok(pageHospSet);
     }
 
@@ -73,7 +78,8 @@ public class HospitalSetController {
 
     @ApiOperation("根据id获取医院设置")
     @GetMapping("/getHospSet/{id}")
-    public Result saveHospSetById(@PathVariable("id") Long id){
+    public Result getHospSetById(@PathVariable("id") Long id){
+//        try{int i = 2/0;}catch (Exception e){ throw new HospitalException("失败",201);}
         HospitalSet hospitalSet = hospitalSetService.getById(id);
         return Result.ok(hospitalSet);
     }
@@ -92,9 +98,7 @@ public class HospitalSetController {
         return removeByIds ? Result.ok() : Result.fail();
     }
 
-    @ApiOperation("医院设置锁定和解锁" +
-            "" +
-            "")
+    @ApiOperation("医院设置锁定和解锁")
     @PutMapping("/lockHospSet/{id}/{status}")
     public Result lockHospSet(@PathVariable("id") Long id,@PathVariable("status") Integer status){
         HospitalSet hospitalSet = hospitalSetService.getById(id);
