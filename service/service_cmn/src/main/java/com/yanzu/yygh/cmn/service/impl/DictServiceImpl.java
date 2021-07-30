@@ -2,11 +2,12 @@ package com.yanzu.yygh.cmn.service.impl;
 
 import com.alibaba.excel.EasyExcel;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.yanzu.yygh.cmn.listeners.DictListener;
-import com.yanzu.yygh.cmn.mapper.DictMapper;
+
 import com.yanzu.yygh.cmn.service.DictService;
-import com.yanzu.yygh.common.result.Result;
+import com.yanzu.yygh.cmn.mapper.DictMapper;
 import com.yanzu.yygh.model.cmn.Dict;
 import com.yanzu.yygh.vo.DictVo;
 import org.springframework.beans.BeanUtils;
@@ -101,9 +102,7 @@ public class DictServiceImpl extends ServiceImpl<DictMapper, Dict> implements Di
     //根据dictCode获取下级节点
     @Override
     public List<Dict> findByDictCode(String dictCode) {
-        QueryWrapper<Dict> wrapper = new QueryWrapper<>();
-        wrapper.eq("dict_code",dictCode);
-        Dict dict = baseMapper.selectOne(wrapper);
+        Dict dict = baseMapper.selectOne(new QueryWrapper<Dict>().eq("dict_code",dictCode));
         Long id = dict.getId();
         return this.findChidrenDataById(id);
     }
