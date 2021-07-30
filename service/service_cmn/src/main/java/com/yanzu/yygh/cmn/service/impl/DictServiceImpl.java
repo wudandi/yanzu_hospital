@@ -28,6 +28,7 @@ import java.util.List;
 @Service
 public class DictServiceImpl extends ServiceImpl<DictMapper, Dict> implements DictService {
 
+    //根据id查询子节点数据列表
     @Override
     @Cacheable(value = "dict",keyGenerator = "keyGenerator")//从数据库缓存数据
     public List<Dict> findChidrenDataById(Long id) {
@@ -95,6 +96,16 @@ public class DictServiceImpl extends ServiceImpl<DictMapper, Dict> implements Di
             return dictFind.getName();
         }
 
+    }
+
+    //根据dictCode获取下级节点
+    @Override
+    public List<Dict> findByDictCode(String dictCode) {
+        QueryWrapper<Dict> wrapper = new QueryWrapper<>();
+        wrapper.eq("dict_code",dictCode);
+        Dict dict = baseMapper.selectOne(wrapper);
+        Long id = dict.getId();
+        return this.findChidrenDataById(id);
     }
 
     //判断有无子树

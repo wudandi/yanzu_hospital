@@ -1,6 +1,8 @@
 package com.yanzu.yygh.hosp.service.impl;
 
 import com.alibaba.fastjson.JSONObject;
+import com.yanzu.yygh.cmn.client.DictFeignClient;
+import com.yanzu.yygh.common.result.Result;
 import com.yanzu.yygh.hosp.repository.HospitalRepository;
 import com.yanzu.yygh.hosp.service.HospitalService;
 import com.yanzu.yygh.model.hosp.Hospital;
@@ -8,9 +10,11 @@ import com.yanzu.yygh.vo.HospitalQueryVo;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.*;
+import org.springframework.stereotype.Repository;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -21,6 +25,8 @@ import java.util.Map;
 public class HospitalServiceImpl implements HospitalService {
     @Autowired
     private HospitalRepository hospitalRepository;
+    @Autowired
+    private DictFeignClient dictFeignClient;
 
     @Override
     public void save(Map<String, Object> objectMap) {
@@ -53,13 +59,24 @@ public class HospitalServiceImpl implements HospitalService {
 
     @Override
     public Page<Hospital> selectHosPage(Integer page, Integer limit, HospitalQueryVo hospitalQueryVo) {
-        Pageable pageable = PageRequest.of(page,limit);
+        Pageable pageable = PageRequest.of(page-1,limit);
         ExampleMatcher exampleMatcher = ExampleMatcher.matching().withStringMatcher(ExampleMatcher.StringMatcher.CONTAINING).withIgnoreCase(true);
         Hospital hospital = new Hospital();
         BeanUtils.copyProperties(hospitalQueryVo,hospital);
         Example<Hospital> example = Example.of(hospital, exampleMatcher);
         Page<Hospital> all = hospitalRepository.findAll(example, pageable);
+        all.getContent().stream().forEach(i->{this.getHospitalHosType(i);});
         return all;
+    }
+
+    private Hospital getHospitalHosType(Hospital hospital) {
+        String hostypeStr = dictFeignClient.getName("Hostype", hospital.getHostype());
+        String provinceName = dictFeignClient.getName(hospital.getProvinceCode());
+        String cityName = dictFeignClient.getName(hospital.getCityCode());
+        String districtName = dictFeignClient.getName(hospital.getDistrictCode());
+        hospital.getParam().put("hostypeStr",hostypeStr);
+        hospital.getParam().put("addr",provinceName+districtName+cityName);
+        return hospital;
     }
 
 }

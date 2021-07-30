@@ -47,12 +47,19 @@ public class DictController {
 
     //根据dictcode和value查询，获取数据字典名称
     @GetMapping("/getName/{dictCode}/{value}")
-    public Result getName(@PathVariable String dictCode,@PathVariable String value){
-        return Result.ok(dictService.getDictName(dictCode,value));
+    public String getName(@PathVariable String dictCode,@PathVariable String value){
+        return dictService.getDictName(dictCode,value);
     }
     //根据value查询
     @GetMapping("/getName/{value}")
-    public Result getName(@PathVariable String value){
-        return Result.ok(dictService.getDictName("",value));
+    public String getName(@PathVariable String value){
+        return dictService.getDictName("",value);
+    }
+
+    //根据dictCode获取下级节点
+    @GetMapping("/findByDictCode/{dictCode}")
+    public Result findByDictCode(@PathVariable("dictCode") String dictCode){
+        List<Dict> list = dictService.findByDictCode(dictCode);
+        return Result.ok(list);
     }
 }
